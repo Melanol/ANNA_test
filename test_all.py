@@ -1,10 +1,6 @@
 """Execute with "pytest" in-console on this folder."""
 
 import datetime
-import os
-import argparse
-import shutil  # High level file operations.
-import pytest
 import requests
 import jwt
 import sqlite3
