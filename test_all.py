@@ -73,9 +73,9 @@ class TestClass:
         """/api/v1/login."""
         create_test_user()
 
-        payload = {'username': test_user_username,
+        headers = {'username': test_user_username,
                    'password': test_user_password}
-        r = requests.post(V1_URL+'login', params=payload)
+        r = requests.post(V1_URL+'login', headers=headers)
         try:
             assert r.json() == {'Result': 'Success'}
         finally:
@@ -160,9 +160,9 @@ class TestClass:
     def test_login_wrong_user(self):
         create_test_user()
         try:
-            payload = {'username': "Wrong user",
+            headers = {'username': "Wrong user",
                        'password': test_user_password}
-            r = requests.post(V1_URL+'login', params=payload)
+            r = requests.post(V1_URL+'login', headers=headers)
             assert r.json() == {'Result': 'User not found'}
         finally:
             delete_test_user()
@@ -170,9 +170,9 @@ class TestClass:
     def test_login_wrong_password(self):
         create_test_user()
         try:
-            payload = {'username': test_user_username,
+            headers = {'username': test_user_username,
                        'password': 'Wrong password'}
-            r = requests.post(V1_URL+'login', params=payload)
+            r = requests.post(V1_URL+'login', headers=headers)
             assert r.json() == {'Result': 'Wrong password'}
         finally:
             delete_test_user()

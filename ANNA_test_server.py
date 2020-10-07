@@ -10,6 +10,8 @@ SECRET_KEY = "7hkBxrbZ9Td4dfwgRewV6gZSVH4q78vBia4GFGqd09SsiMghjH7"
 app = Flask(__name__)
 app.config["DEBUG"] = True
 
+# TODO: REST
+
 def dict_factory(cursor, row):
     """Returns items from the database
     as dictionaries rather than lists."""
@@ -57,12 +59,11 @@ def register():
 
 @app.route('/api/v1/login', methods=['GET', 'POST'])
 def login():
-    # TODO: password in the header.
     """Called when a token has expired or the user has logged off.
-    Query parameters: username, password"""
-    query_parameters = request.args
-    username = query_parameters.get('username')
-    password = query_parameters.get('password')
+    Headers: username, password"""
+    query_headers = request.headers
+    username = query_headers.get('username')
+    password = query_headers.get('password')
     query = f""" SELECT * FROM users WHERE username='{username}' """
     conn = sqlite3.connect('anna_sqlite.db')
     cur = conn.cursor()
