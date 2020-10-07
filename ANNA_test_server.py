@@ -196,7 +196,7 @@ def filter(data):
 
     return jsonify(results)
 
-@app.route('/api/v1/resources/tasks/create_task',
+@app.route('/api/v1/resources/tasks/create',
            methods=['GET', 'POST'])
 @token_required
 def create_task(data):
@@ -246,7 +246,7 @@ def create_task(data):
     response.headers['ID'] = id
     return response
 
-@app.route('/api/v1/resources/tasks/edit_task', methods=['GET', 'POST'])
+@app.route('/api/v1/resources/tasks/edit', methods=['GET', 'POST'])
 @token_required
 def edit_task(data):
     """Query parameters: id[, new_name, description, status,
@@ -288,7 +288,7 @@ def edit_task(data):
     conn.close()
     return jsonify({'Result': 'Success'})
 
-@app.route('/api/v1/resources/tasks/delete_task',
+@app.route('/api/v1/resources/tasks/delete',
            methods=['GET', 'POST'])
 @token_required
 def delete_task(data):

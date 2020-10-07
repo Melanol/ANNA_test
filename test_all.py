@@ -41,14 +41,14 @@ def create_task(token):
                'status': test_task_status,
                'planned_end_time': end.strftime(TIME_F)}
     headers = {'Token': token}
-    r = requests.post(V1_URL+'resources/tasks/create_task',
+    r = requests.post(V1_URL+'resources/tasks/create',
                       params=payload, headers=headers)
     return r
 
 def delete_task(token, id):
     payload = {'id': id}
     headers = {'Token': token}
-    r = requests.post(V1_URL+'resources/tasks/delete_task',
+    r = requests.post(V1_URL+'resources/tasks/delete',
                       params=payload, headers=headers)
     return r
 
@@ -126,8 +126,8 @@ class TestClass:
             delete_test_user()
 
     def test_create_n_delete_task(self):
-        """/api/v1/resources/tasks/create_task,
-        /api/v1/resources/tasks/delete_task."""
+        """/api/v1/resources/tasks/create,
+        /api/v1/resources/tasks/delete."""
         token = create_test_user()
         try:
             r = create_task(token)
@@ -138,7 +138,7 @@ class TestClass:
             delete_test_user()
 
     def test_edit_task(self):
-        """/api/v1/resources/tasks/edit_task."""
+        """/api/v1/resources/tasks/edit."""
         token = create_test_user()
         try:
             r = create_task(token)
@@ -150,7 +150,7 @@ class TestClass:
                        'status': 'working',
                        'planned_end_time': end.strftime(TIME_F)}
             headers = {'Token': token}
-            r = requests.post(V1_URL+'resources/tasks/edit_task',
+            r = requests.post(V1_URL+'resources/tasks/edit',
                               params=payload, headers=headers)
             assert r.json() == {'Result': 'Success'}
         finally:
