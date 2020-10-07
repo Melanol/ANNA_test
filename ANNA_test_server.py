@@ -1,5 +1,6 @@
 import os
 import datetime
+import hashlib
 from flask import *
 import sqlite3
 import jwt
@@ -17,22 +18,27 @@ def dict_factory(cursor, row):
         d[col[0]] = row[idx]
     return d
 
+def hash(password):
+    """https://nitratine.net/blog/post/how-to-hash-passwords-in-python/."""
+    salt = os.urandom(32)  # A new salt for this user
+    key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt,
+                              100000)
+    return salt, key
+
 @app.errorhandler(404)
 def page_not_found(e):
     return jsonify({'Result': 'Resource not found'}), 404
 
 @app.route('/api/v1/register', methods=['GET', 'POST'])
 def register():
-    # TODO: Password hashing.
     """Query parameters: username, password"""
     query_parameters = request.args
     username = query_parameters.get('username')
     password = query_parameters.get('password')
-
-    query = """ INSERT INTO users (username, password)
-                VALUES (?, ?); """
-    values = [username, password]
-
+    salt, key = hash(password)
+    query = """ INSERT INTO users (username, salt, key)
+                VALUES (?, ?, ?); """
+    values = [username, salt, key]
     conn = sqlite3.connect('anna_sqlite.db')
     cur = conn.cursor()
     try:
@@ -51,6 +57,7 @@ def register():
 
 @app.route('/api/v1/login', methods=['GET', 'POST'])
 def login():
+    # TODO: password in the header.
     """Called when a token has expired or the user has logged off.
     Query parameters: username, password"""
     query_parameters = request.args
@@ -65,8 +72,10 @@ def login():
         return jsonify({'Result': f'SQL Error: {str(e)}'})
     if not sql_returned:
         return jsonify({'Result': 'User not found'})
-    returned_password = sql_returned[0][1]
-    if password != returned_password:
+    salt, key = sql_returned[0][1], sql_returned[0][2]
+    new_key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'),
+                              salt, 100000)
+    if new_key != key:
         return jsonify({'Result': 'Wrong password'})
     # User found, passwords match. Returning token.
     time_limit = datetime.datetime.utcnow() \

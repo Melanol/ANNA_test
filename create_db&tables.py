@@ -18,20 +18,21 @@ def create_table(conn, create_table_sql):
 def main():
     sql_create_users_table = \
         """ CREATE TABLE IF NOT EXISTS users (
-            username text PRIMARY KEY NOT NULL,
-            password text NOT NULL
+            username TEXT PRIMARY KEY NOT NULL,
+            salt TEXT NOT NULL,
+            key TEXT NOT NULL
             ); """
 
     sql_create_tasks_table = \
         """ CREATE TABLE IF NOT EXISTS tasks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username text,
-            name text NOT NULL,
-            description text NOT NULL,
-            creation_time text NOT NULL,
-            status text NOT NULL CHECK(status in
+            username TEXT,
+            name TEXT NOT NULL,
+            description TEXT NOT NULL,
+            creation_time TEXT NOT NULL,
+            status TEXT NOT NULL CHECK(status in
                 ('new', 'planned', 'working', 'finished')),
-            planned_end_time text,
+            planned_end_time TEXT,
             FOREIGN KEY(username) REFERENCES users(username)
             );"""
 

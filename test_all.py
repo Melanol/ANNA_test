@@ -64,8 +64,10 @@ class TestClass:
         changes, as an SQL error would fail the test anyway."""
         token = create_test_user()
         data = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
-        assert data['username'] == test_user_username
-        delete_test_user()
+        try:
+            assert data['username'] == test_user_username
+        finally:
+            delete_test_user()
 
     def test_login(self):
         """/api/v1/login."""
@@ -74,8 +76,10 @@ class TestClass:
         payload = {'username': test_user_username,
                    'password': test_user_password}
         r = requests.post(V1_URL+'login', params=payload)
-        assert r.json() == {'Result': 'Success'}
-        delete_test_user()
+        try:
+            assert r.json() == {'Result': 'Success'}
+        finally:
+            delete_test_user()
 
     def test_all_n_filter(self):
         """/api/v1/resources/tasks/all,

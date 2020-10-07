@@ -1,9 +1,9 @@
-# ANNA_test
+﻿# ANNA_test
 
 This is a test project for a company called ANNA. It's a web API + server for a personal task manager.
 Run “ANNA_test_server.py” to start the server.
 Functionality:
-- Users can register and login using username + password, and they receive a JSON web token after for authentication. The system can have multiple users. The user receives a token the moment they register or login, they can stay in the system for 30 days, each successful login sends them a new token, prolonging their stay in the system. The system stores passwords without any hashing (for now).
+- Users can register and login using username + password, and they receive a JSON web token after for authentication. The system can have multiple users. The user receives a token the moment they register or login, they can stay in the system for 30 days, each successful login sends them a new token, prolonging their stay in the system. The system stores hashed passwords with salt.
 - The client communicates with the server using http headers and JSONs. The token is transferred in the header “Token”.
 - The database in on SQLite. There are 2 tables: “users” and “tasks”. The structures are following:
             CREATE TABLE IF NOT EXISTS users (
