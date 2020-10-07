@@ -46,8 +46,8 @@ def register():
     cur = conn.cursor()
     try:
         cur.execute(query, values)
-    except sqlite3.Error as e:
-        return jsonify({'Result': f'SQL Error: {str(e)}'})
+    except sqlite3.Error:
+        return jsonify({'Result': 'SQL Error'})
     conn.commit()
     conn.close()
     time_limit = datetime.datetime.utcnow() \
@@ -237,8 +237,8 @@ def create_task(data):
     cur = conn.cursor()
     try:
         cur.execute(query, values)
-    except sqlite3.Error as e:
-        return jsonify({'Result': f'SQL Error: {str(e)}'})
+    except sqlite3.Error:
+        return jsonify({'Result': 'SQL Error'})
     conn.commit()
     id = cur.lastrowid
     conn.close()
@@ -282,8 +282,8 @@ def edit_task(data):
     cur = conn.cursor()
     try:
         cur.execute(query, values)
-    except sqlite3.Error as e:
-        return jsonify({'Result': f'SQL Error: {str(e)}'})
+    except sqlite3.Error:
+        return jsonify({'Result': 'SQL Error'})
     conn.commit()
     conn.close()
     return jsonify({'Result': 'Success'})
@@ -301,8 +301,8 @@ def delete_task(data):
     cur = conn.cursor()
     try:
         cur.execute(query, values)
-    except sqlite3.Error as e:
-        return jsonify({'Result': f'SQL Error: {str(e)}'})
+    except sqlite3.Error:
+        return jsonify({'Result': 'SQL Error'})
     conn.commit()
     conn.close()
     return jsonify({'Result': 'Success'})
