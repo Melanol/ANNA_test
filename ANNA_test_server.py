@@ -250,7 +250,6 @@ def create_task(data):
 @app.route('/api/v1/resources/tasks/edit_task', methods=['GET', 'POST'])
 @token_required
 def edit_task(data):
-    # TODO: PUT instead of POST
     """Query parameters: id[, new_name, description, status,
     planned_end_time]"""
     username = data['username']
