@@ -3,30 +3,11 @@ import datetime
 import hashlib
 import sqlite3
 
-from flask import *
-import jwt
-
-from secret_key import SECRET_KEY
+from utilities import *
 
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
-
-
-def dict_factory(cursor, row):
-    """Returns items from the database
-    as dictionaries rather than lists."""
-    d = {}
-    for idx, col in enumerate(cursor.description):
-        d[col[0]] = row[idx]
-    return d
-
-def hash(password):
-    """https://nitratine.net/blog/post/how-to-hash-passwords-in-python/."""
-    salt = os.urandom(32)  # A new salt for this user
-    key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt,
-                              100000)
-    return salt, key
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -38,7 +19,12 @@ def register():
     query_parameters = request.args
     username = query_parameters.get('username')
     password = query_parameters.get('password')
-    salt, key = hash(password)
+
+    # https://nitratine.net/blog/post/how-to-hash-passwords-in-python/.
+    salt = os.urandom(32)
+    key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt,
+                              100000)
+
     query = """ INSERT INTO users (username, salt, key)
                 VALUES (?, ?, ?); """
     values = [username, salt, key]
@@ -65,7 +51,7 @@ def login():
     query_headers = request.headers
     username = query_headers.get('username')
     password = query_headers.get('password')
-    query = f""" SELECT * FROM users WHERE username='?' """
+    query = " SELECT * FROM users WHERE username = ? "
     values = [username]
     conn = sqlite3.connect('anna_sqlite.db')
     cur = conn.cursor()
@@ -89,47 +75,6 @@ def login():
     response.headers['Token'] = token
     return response
 
-def token_required(func):
-    def wrapper():
-        try:
-            token_passed = request.headers['Token']
-            if request.headers['Token'] != '' and \
-                    request.headers['Token'] != None:
-                try:
-                    data = jwt.decode(token_passed, SECRET_KEY,
-                                      algorithms=['HS256'])
-                    return func(data)
-                except jwt.exceptions.ExpiredSignatureError:
-                    return_data = {
-                        "error": "1",
-                        "message": "Token has expired"
-                        }
-                    return app.response_class(response=json.dumps(
-                        return_data), mimetype='application/json'), 401
-                except Exception :
-                    return_data = {
-                        "error": "1",
-                        "message": "Invalid Token"
-                    }
-                    return app.response_class(response=json.dumps(
-                        return_data), mimetype='application/json'), 401
-            else:
-                return_data = {
-                    "error" : "2",
-                    "message" : "Token required",
-                }
-                return app.response_class(response=json.dumps(
-                    return_data), mimetype='application/json'), 401
-        except Exception:
-            return_data = {
-                "error" : "3"
-                }
-            return app.response_class(response=json.dumps(
-                return_data), mimetype='application/json'), 500
-
-    wrapper.__name__ = func.__name__
-    return wrapper
-
 @app.route('/api/v1/resources/tasks/all', methods=['GET'])
 @token_required
 def tasks_all(data):
@@ -140,7 +85,7 @@ def tasks_all(data):
     if data['username'] != username:
         return jsonify({'Result': 'Wrong user'})
     cur = conn.cursor()
-    query = " SELECT * FROM tasks WHERE username='?' "
+    query = " SELECT * FROM tasks WHERE username=? "
     values = [username]
     sql_returned = cur.execute(query, values).fetchall()
     response = make_response(jsonify(sql_returned))
@@ -289,8 +234,7 @@ def edit_task(data):
     conn.close()
     return jsonify({'Result': 'Success'})
 
-@app.route('/api/v1/resources/tasks/delete',
-           methods=['GET', 'POST'])
+@app.route('/api/v1/resources/tasks/delete', methods=['GET', 'POST'])
 @token_required
 def delete_task(data):
     """Query parameters: id."""
