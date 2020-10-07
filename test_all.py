@@ -5,8 +5,9 @@ import requests
 import jwt
 import sqlite3
 
+from secret_key import SECRET_KEY
 
-SECRET_KEY = "7hkBxrbZ9Td4dfwgRewV6gZSVH4q78vBia4GFGqd09SsiMghjH7"
+
 V1_URL = 'http://127.0.0.1:5000/api/v1/'
 
 test_user_username = 'Leonidas'

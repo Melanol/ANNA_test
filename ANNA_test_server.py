@@ -1,12 +1,14 @@
 import os
 import datetime
 import hashlib
-from flask import *
 import sqlite3
+
+from flask import *
 import jwt
 
+from secret_key import SECRET_KEY
 
-SECRET_KEY = "7hkBxrbZ9Td4dfwgRewV6gZSVH4q78vBia4GFGqd09SsiMghjH7"
+
 app = Flask(__name__)
 app.config["DEBUG"] = True
 
