@@ -12,7 +12,6 @@ from secret_key import SECRET_KEY
 app = Flask(__name__)
 app.config["DEBUG"] = True
 
-# TODO: REST
 
 def dict_factory(cursor, row):
     """Returns items from the database
