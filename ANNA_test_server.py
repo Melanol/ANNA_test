@@ -65,13 +65,14 @@ def login():
     query_headers = request.headers
     username = query_headers.get('username')
     password = query_headers.get('password')
-    query = f""" SELECT * FROM users WHERE username='{username}' """
+    query = f""" SELECT * FROM users WHERE username='?' """
+    values = [username]
     conn = sqlite3.connect('anna_sqlite.db')
     cur = conn.cursor()
     try:
-        sql_returned = cur.execute(query).fetchall()
-    except sqlite3.Error as e:
-        return jsonify({'Result': f'SQL Error: {str(e)}'})
+        sql_returned = cur.execute(query, values).fetchall()
+    except sqlite3.Error:
+        return jsonify({'Result': 'SQL Error'})
     if not sql_returned:
         return jsonify({'Result': 'User not found'})
     salt, key = sql_returned[0][1], sql_returned[0][2]
@@ -105,10 +106,10 @@ def token_required(func):
                         }
                     return app.response_class(response=json.dumps(
                         return_data), mimetype='application/json'), 401
-                except Exception as e:
+                except Exception :
                     return_data = {
                         "error": "1",
-                        "message": f"Invalid Token: {e}"
+                        "message": "Invalid Token"
                     }
                     return app.response_class(response=json.dumps(
                         return_data), mimetype='application/json'), 401
@@ -119,10 +120,9 @@ def token_required(func):
                 }
                 return app.response_class(response=json.dumps(
                     return_data), mimetype='application/json'), 401
-        except Exception as e:
+        except Exception:
             return_data = {
-                "error" : "3",
-                "message" : str(e)
+                "error" : "3"
                 }
             return app.response_class(response=json.dumps(
                 return_data), mimetype='application/json'), 500
@@ -140,8 +140,9 @@ def tasks_all(data):
     if data['username'] != username:
         return jsonify({'Result': 'Wrong user'})
     cur = conn.cursor()
-    sql_returned = cur.execute(
-        f'SELECT * FROM tasks WHERE username="{username}"').fetchall()
+    query = " SELECT * FROM tasks WHERE username='?' "
+    values = [username]
+    sql_returned = cur.execute(query, values).fetchall()
     response = make_response(jsonify(sql_returned))
     return response
 
